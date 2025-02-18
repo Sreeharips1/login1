@@ -1,10 +1,10 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+
 import Navbar from "@/components/Navbar";
 
 export default function MemberDashboard() {
-  const router = useRouter();
+  
 
   useEffect(() => {
     // Check if user is logged in (token exists in localStorage)
