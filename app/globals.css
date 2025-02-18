@@ -2,20 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Custom Styles */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-dark text-white;
+}
+
+.input {
+  @apply w-full p-3 rounded-lg bg-white/10 border border-white/20 focus:border-primary transition;
+}
+
+.button {
+  @apply w-full bg-primary hover:bg-red-700 text-white font-semibold py-2 rounded-lg transition;
 }
