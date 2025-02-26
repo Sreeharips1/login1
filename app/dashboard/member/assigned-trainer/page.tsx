@@ -18,7 +18,7 @@ export default function AssignedTrainerPage() {
       try {
         const { data } = await axios.get<Trainer>("http://localhost:5000/api/trainers/assigned-trainer");
         setTrainer(data);
-      } catch (error) {
+      } catch  {
         toast.error("Failed to fetch trainer details");
       }
     };

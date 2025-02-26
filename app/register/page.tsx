@@ -49,7 +49,7 @@ export default function Register() {
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    let validationErrors: { [key: string]: string } = {};
+    const validationErrors: { [key: string]: string } = {};
 
     if (!user.name || /\d/.test(user.name)) validationErrors.name = "Full Name cannot contain numbers";
     if (!user.phone || !/^\d{10}$/.test(user.phone)) validationErrors.phone = "Must be a valid 10-digit number";

@@ -3,6 +3,7 @@
 // import { useState, useEffect } from "react";
 // import axios from "axios";
 // import { toast } from "react-hot-toast";
+// import { Loader, CheckCircle, XCircle } from "lucide-react";
 
 // const MEMBERSHIP_PLANS = [
 //   { name: "Monthly", price: 1000 },
@@ -65,39 +66,47 @@
 //   if (loading) {
 //     return (
 //       <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white">
-//         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+//         <Loader className="animate-spin h-12 w-12 text-red-500" />
 //       </div>
 //     );
 //   }
 
 //   return (
-//     <div className="p-4">
+//     <div className="p-6 md:p-10 bg-gray-900 min-h-screen text-white">
 //       {/* Welcome Section */}
-//       <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-center mb-8">
-//         <h1 className="text-2xl font-bold">Welcome, {member?.name || "User"}</h1>
+//       <div className="bg-gray-800 p-6 rounded-xl shadow-lg text-center mb-10">
+//         <h1 className="text-3xl font-bold">Welcome, {member?.name || "User"}</h1>
 //         <p className="text-gray-400">{member?.email || "Email not available"}</p>
-//         <p className="mt-2">
-//           <strong>Membership Status: </strong>
-//           <span className={paymentStatus === "Active" ? "text-green-400" : "text-red-400"}>
-//             {paymentStatus}
-//           </span>
+//         <p className="mt-4 flex items-center justify-center space-x-2">
+//           <strong className="text-lg">Membership Status:</strong>
+//           {paymentStatus === "Active" ? (
+//             <span className="flex items-center text-green-400">
+//               <CheckCircle className="h-5 w-5 mr-1" /> Active
+//             </span>
+//           ) : (
+//             <span className="flex items-center text-red-400">
+//               <XCircle className="h-5 w-5 mr-1" /> Inactive
+//             </span>
+//           )}
 //         </p>
 //       </div>
 
 //       {/* Membership Plans Section */}
-//       <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-//         <h2 className="text-xl font-bold mb-4 text-center">Select Membership Plan</h2>
-//         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//       <div className="bg-gray-800 p-8 rounded-xl shadow-lg">
+//         <h2 className="text-2xl font-bold mb-6 text-center">Choose a Membership Plan</h2>
+//         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 //           {MEMBERSHIP_PLANS.map((plan) => (
 //             <div
 //               key={plan.name}
-//               className={`p-6 rounded-lg cursor-pointer border ${
-//                 selectedPlan?.name === plan.name ? "border-red-500 bg-gray-700" : "border-gray-600"
+//               className={`p-6 rounded-lg cursor-pointer transition-all transform hover:scale-105 ${
+//                 selectedPlan?.name === plan.name
+//                   ? "border-2 border-red-500 bg-gray-700"
+//                   : "border border-gray-600 bg-gray-800 hover:border-red-400"
 //               }`}
 //               onClick={() => handleSelectPlan(plan)}
 //             >
-//               <h3 className="text-lg font-semibold text-center">{plan.name}</h3>
-//               <p className="text-gray-400 text-center mt-2">₹{plan.price}</p>
+//               <h3 className="text-xl font-semibold text-center">{plan.name}</h3>
+//               <p className="text-gray-300 text-center mt-2 text-lg">₹{plan.price}</p>
 //             </div>
 //           ))}
 //         </div>
@@ -105,12 +114,14 @@
 //         {/* Payment Button */}
 //         <button
 //           onClick={handlePayment}
-//           className={`w-full mt-6 py-3 rounded-lg text-white font-semibold ${
-//             paymentStatus === "Active" ? "bg-gray-500 cursor-not-allowed" : "bg-red-500 hover:bg-red-600"
+//           className={`w-full mt-8 py-3 rounded-lg font-semibold text-lg transition-all ${
+//             paymentStatus === "Active"
+//               ? "bg-gray-500 cursor-not-allowed"
+//               : "bg-red-500 hover:bg-red-600"
 //           }`}
 //           disabled={paymentStatus === "Active"}
 //         >
-//           {paymentStatus === "Active" ? "Membership Active" : "Pay Now"}
+//           {paymentStatus === "Active" ? "Membership Active" : "Proceed to Payment"}
 //         </button>
 //       </div>
 //     </div>
@@ -128,11 +139,17 @@ const MEMBERSHIP_PLANS = [
   { name: "Annual", price: 5000 },
 ];
 
+interface Member {
+  name: string;
+  email: string;
+  membershipStatus: "Active" | "Inactive";
+}
+
 export default function DashboardHome() {
-  const [member, setMember] = useState<Record<string, any> | null>(null);
+  const [member, setMember] = useState<Member | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<{ name: string; price: number } | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState("Inactive");
+  const [paymentStatus, setPaymentStatus] = useState<"Active" | "Inactive">("Inactive");
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -143,8 +160,12 @@ export default function DashboardHome() {
 
         setMember(data);
         setPaymentStatus(data?.membershipStatus || "Inactive");
-      } catch (err: any) {
-        toast.error(err.response?.data?.message || "Failed to load member data");
+      } catch (err: unknown) {
+        if (axios.isAxiosError(err)) {
+          toast.error(err.response?.data?.message || "Failed to load member data");
+        } else {
+          toast.error("An unexpected error occurred");
+        }
       } finally {
         setLoading(false);
       }
@@ -175,8 +196,12 @@ export default function DashboardHome() {
       } else {
         toast.error("Payment failed. Try again");
       }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Error processing payment");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Error processing payment");
+      } else {
+        toast.error("Unexpected error occurred");
+      }
     }
   };
 

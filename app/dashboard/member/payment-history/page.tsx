@@ -65,7 +65,7 @@ export default function PaymentHistoryPage() {
           { withCredentials: true } // Ensures session cookies are sent
         );
         setPayments(data);
-      } catch (error) {
+      } catch  {
         toast.error("Failed to fetch payment history");
       }
     };
