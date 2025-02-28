@@ -36,36 +36,7 @@ export default function TermsAndPolicy() {
             </ul>
           </section>
   
-          {/* Return and Refund Policy */}
-          <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">Return and Refund Policy</h2>
-            <ul className="text-sm list-disc pl-5">
-              <li><strong>Membership Cancellation:</strong> Notify within 14 days for a refund (charges apply).</li>
-              <li><strong>Refund Processing:</strong> Refunds via PhonePe take 7-10 business days.</li>
-              <li><strong>Non-Refundable Charges:</strong> Discounted packages and personal training are non-refundable.</li>
-            </ul>
-            <p className="text-sm mt-2">To initiate a refund, email us at <a href="mailto:enquiries@flexzonegym.com" className="text-primary">enquiries@flexzonegym.com</a>.</p>
-          </section>
-  
-          {/* Shipping Policy */}
-          <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">Shipping Policy</h2>
-            <p className="text-sm">Flex Zone Gym offers digital services only.</p>
-            <ul className="text-sm list-disc pl-5">
-              <li><strong>Service Activation:</strong> All services are activated after PhonePe payment confirmation.</li>
-              <li><strong>Delivery of Services:</strong> Digital services (classes, consultations) are provided instantly.</li>
-            </ul>
-          </section>
-  
-          {/* Cancellation Policy */}
-          <section className="mb-6">
-            <h2 className="text-xl font-semibold mb-2">Cancellation Policy</h2>
-            <ul className="text-sm list-disc pl-5">
-              <li><strong>Membership Cancellation:</strong> Cancel anytime (refer to the refund policy).</li>
-              <li><strong>Class Cancellation:</strong> Notify 24 hours in advance to avoid charges.</li>
-              <li><strong>No-Show Policy:</strong> Missing a class without notice results in penalties.</li>
-            </ul>
-          </section>
+          
   
           <div className="mt-6 text-center">
             <a href="/register" className="text-primary underline">Go Back</a>

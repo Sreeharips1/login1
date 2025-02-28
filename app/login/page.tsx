@@ -81,6 +81,7 @@ export default function Login() {
         <p className="text-gray-300 text-sm mt-3 text-center">
           Don&apos;t have an account? <Link href="/register" className="text-primary">Register</Link>
         </p>
+        <p className="text-primary text-center"><Link href="https://flexzone-gym.vercel.app/" >Back Home</Link></p>
       </div>
     </div>
   );

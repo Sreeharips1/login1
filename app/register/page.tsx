@@ -108,8 +108,8 @@ export default function Register() {
           Already have an account? <Link href="/login" className="text-primary text-white">Login</Link>
         </p>
         <p className="text-red-500 text-sm mt-3 text-center">
-          By registering here,you agree to  <Link href="/privacy-policy">Privacy Policy,</Link>
-            <Link href="/terms-conditions">Terms & Conditions,</Link>
+          By registering here,you agree to  <Link href="/terms-policy" className="text-primary underline">Terms & condition,Privacy Policy</Link>
+            
             
         </p>
       </div>
