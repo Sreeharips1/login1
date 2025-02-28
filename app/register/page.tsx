@@ -112,6 +112,7 @@ export default function Register() {
             
             
         </p>
+        <p className="text-primary text-center"><Link href="https://flexzone-gym.vercel.app/" >Back Home</Link></p>
       </div>
     </div>
   );
