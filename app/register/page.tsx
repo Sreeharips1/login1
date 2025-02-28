@@ -64,7 +64,7 @@ export default function Register() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", user);
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/register`, user);
       alert("Registration successful! Please login.");
       router.push("/login");
     } catch (error) {
@@ -106,6 +106,11 @@ export default function Register() {
         </form>
         <p className="text-red-500 text-sm mt-3 text-center">
           Already have an account? <Link href="/login" className="text-primary text-white">Login</Link>
+        </p>
+        <p className="text-red-500 text-sm mt-3 text-center">
+          By registering here,you agree to  <Link href="/privacy-policy">Privacy Policy,</Link>
+            <Link href="/terms-conditions">Terms & Conditions,</Link>
+            
         </p>
       </div>
     </div>

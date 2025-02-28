@@ -16,7 +16,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/notifications");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications`);
         if (!response.ok) throw new Error("Failed to fetch notifications");
         const data = await response.json();
         setNotifications(data);
