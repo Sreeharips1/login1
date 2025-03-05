@@ -222,6 +222,7 @@ export default function DashboardHome() {
             });
           }
         } catch (err) {
+          console.error("Payment error:", err);
           setPaymentStatus({
             isChecking: false,
             message: "Error checking payment status",
