@@ -63,7 +63,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
   const handleLogout = async () => {
     try {
       // Call your logout API if needed
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/logout`, {}, { withCredentials: true });
+      await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/logout`,  { withCredentials: true });
       
       // Clear authorization header
       delete axios.defaults.headers.common['Authorization'];

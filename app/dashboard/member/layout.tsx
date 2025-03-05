@@ -1,30 +1,23 @@
-// import Sidebar from "@/components/Sidebar";
-// import Navbar from "@/components/Navbar";
 
-// export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-//   return (
-//     <div className="flex min-h-screen bg-gray-900 text-white">
-//       {/* Sidebar */}
-//       <Sidebar />
-
-//       {/* Main Content */}
-//       <div className="flex-1">
-//         {/* Navbar */}
-//         <Navbar />
-
-//         {/* Page Content */}
-//         <div className="p-6">
-//           {children}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
 "use client";
+import { Oswald, Roboto } from "next/font/google";
+import "./global.css";
+
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 
+const oswald = Oswald({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700"],
+  variable: "--font-oswald",
+});
+
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "500", "700", "900"],
+  variable: "--font-roboto",
+});
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -57,7 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
 
         {/* Main Content */}
-        <div className="flex-1 p-4 md:ml-64">
+        <div className={`${oswald.variable} ${roboto.variable}flex-1 p-4 md:ml-64`}>
           {children}
         </div>
       </div>
