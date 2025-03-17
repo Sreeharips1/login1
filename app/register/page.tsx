@@ -1,258 +1,562 @@
 // "use client";
 // import { useState } from "react";
+// import Image from "next/image";
 // import { useRouter } from "next/navigation";
 // import Link from "next/link";
-// import axios, { AxiosError } from "axios";
 // import { Home } from "lucide-react";
 
-// export default function Register() {
+// export default function RegisterForm() {
 //   const router = useRouter();
-//   const [user, setUser] = useState({
-//     name: "",
-//     age: "",
-//     phone: "",
-//     whatsapp: "",
+//   const [formData, setFormData] = useState({
+//     fullName: "",
 //     email: "",
-//     password: "",
-//     gender: "",
+//     age: "",
+//     gender: "male",
+//     phone: "",
+//     emergency: "",
+//     address: "",
+//     pincode: "",
+//     healthCondition: "",
+//     profileImage: null as File | null,
 //   });
 
-//   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+//   const [preview, setPreview] = useState<string | null>(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
 
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-//     setUser({ ...user, [e.target.name]: e.target.value });
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+//     const { name, value } = e.target;
+//     setFormData({ ...formData, [name]: value });
+//   };
 
-//     switch (e.target.name) {
-//       case "name":
-//         setErrors((prev) => ({
-//           ...prev,
-//           name: /\d/.test(e.target.value) ? "Full Name cannot contain numbers" : "",
-//         }));
-//         break;
-//       case "phone":
-//       case "whatsapp":
-//         setErrors((prev) => ({
-//           ...prev,
-//           [e.target.name]: /^\d{10}$/.test(e.target.value) ? "" : "Must be a valid 10-digit number",
-//         }));
-//         break;
-//       case "password":
-//         setErrors((prev) => ({
-//           ...prev,
-//           password: e.target.value.length < 6 ? "Password must be at least 6 characters" : "",
-//         }));
-//         break;
-//       default:
-//         break;
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       setFormData({ ...formData, profileImage: file });
+//       setPreview(URL.createObjectURL(file));
 //     }
 //   };
 
-//   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+//   const handleSubmit = async (e: React.FormEvent) => {
 //     e.preventDefault();
-    
-//     const validationErrors: { [key: string]: string } = {};
+//     setLoading(true);
+//     setError(null);
 
-//     if (!user.name || /\d/.test(user.name)) validationErrors.name = "Full Name cannot contain numbers";
-//     if (!user.phone || !/^\d{10}$/.test(user.phone)) validationErrors.phone = "Must be a valid 10-digit number";
-//     if (!user.whatsapp || !/^\d{10}$/.test(user.whatsapp)) validationErrors.whatsapp = "Must be a valid 10-digit number";
-//     if (!user.email || !/\S+@\S+\.\S+/.test(user.email)) validationErrors.email = "Invalid email format";
-//     if (!user.password || user.password.length < 6) validationErrors.password = "Password must be at least 6 characters";
-//     if (!user.gender) validationErrors.gender = "Please select your gender";
-
-//     if (Object.keys(validationErrors).length > 0) {
-//       setErrors(validationErrors);
-//       return;
-//     }
+//     const formDataObj = new FormData();
+//     Object.entries(formData).forEach(([key, value]) => {
+//       if (value) formDataObj.append(key, value);
+//     });
 
 //     try {
-//       await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/register`, user);
-//       alert("Registration successful! Please login.");
-//       router.push("/login");
-//     } catch (error) {
-//       const err = error as AxiosError<{ message?: string }>;
-//       setErrors({ form: err.response?.data?.message || "Something went wrong. Please try again." });
+//       const response = await fetch("http://localhost:5000/api/auth/register", {
+//         method: "POST",
+//         body: formDataObj,
+//       });
+
+//       if (response.ok) {
+//         alert("Registration Successful!");
+//         router.push("/dashboard");
+//       } else {
+//         const data = await response.json();
+//         setError(data.error || "Error in Registration");
+//       }
+//     } catch (err) {
+//       setError("An error occurred. Please try again.");
+//     } finally {
+//       setLoading(false);
 //     }
 //   };
 
 //   return (
-//     <div className="flex items-center justify-center h-screen bg-dark">
-//       <div className="bg-white/10 p-10 rounded-xl border border-primary backdrop-blur-lg shadow-lg w-96">
-//         <h2 className="text-white text-2xl font-semibold mb-5 text-center">Register</h2>
-//         {errors.form && <p className="text-red-500 text-sm mb-3">{errors.form}</p>}
-//         <form onSubmit={handleRegister} className="grid grid-cols-2 gap-4">
-//           <div className="col-span-2">
-//             <input name="name" type="text" placeholder="Full Name" className="input w-full" value={user.name} onChange={handleChange} required />
-//             {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+//     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 to-gray-800 p-4">
+//       <div className="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl border-2 border-red-600">
+//         <h2 className="text-3xl font-bold text-white text-center mb-6">Register</h2>
+
+//         {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+
+//         <form onSubmit={handleSubmit} className="space-y-6">
+//           {/* Profile Image Upload */}
+//           <div className="flex justify-center">
+//             <label className="relative cursor-pointer">
+//               <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+//               {preview ? (
+//                 <Image src={preview} alt="Profile" width={100} height={100} className="rounded-full border-4 border-gray-400 object-cover" />
+//               ) : (
+//                 <div className="w-24 h-24 flex items-center justify-center rounded-full border-2 border-red-600 bg-gray-700">
+//                   <span className="text-2xl text-gray-400">📷</span>
+//                 </div>
+//               )}
+//             </label>
 //           </div>
-//           <input name="age" type="number" placeholder="Age" className="input w-full" value={user.age} onChange={handleChange} required />
-//           <select name="gender" className="input w-full" value={user.gender} onChange={handleChange} required>
-//             <option className="text-black" value="" disabled>Select Gender</option>
-//             <option className="text-black" value="male">Male</option>
-//             <option className="text-black" value="female">Female</option>
-//           </select>
-//           {errors.gender && <p className="text-red-500 text-sm col-span-2">{errors.gender}</p>}
-//           <input name="phone" type="text" placeholder="Phone Number" className="input w-full" value={user.phone} onChange={handleChange} required />
-//           {errors.phone && <p className="text-red-500 text-sm col-span-2">{errors.phone}</p>}
-//           <input name="whatsapp" type="text" placeholder="WhatsApp Number" className="input w-full" value={user.whatsapp} onChange={handleChange} required />
-//           {errors.whatsapp && <p className="text-red-500 text-sm col-span-2">{errors.whatsapp}</p>}
-//           <div className="col-span-2">
-//             <input name="email" type="email" placeholder="Email" className="input w-full" value={user.email} onChange={handleChange} required />
-//             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+
+//           {/* Form Fields */}
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//             {["fullName", "email", "age", "phone", "emergency", "address", "pincode", "healthCondition"].map((field) => (
+//               <div key={field}>
+//                 <label className="block text-sm font-medium text-gray-300 mb-1">
+//                   {field.replace(/([A-Z])/g, " $1").trim()}
+//                 </label>
+//                 <input
+//                   type={field === "email" ? "email" : field === "age" || field === "phone" || field === "pincode" ? "number" : "text"}
+//                   name={field}
+//                   placeholder={`Enter ${field.replace(/([A-Z])/g, " $1").trim()}`}
+//                   value={formData[field as keyof typeof formData]}
+//                   onChange={handleChange}
+//                   required
+//                   className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+//                 />
+//               </div>
+//             ))}
+
+//             {/* Gender Selection */}
+//             <div>
+//               <label className="block text-sm font-medium text-gray-300 mb-1">Gender</label>
+//               <select
+//                 name="gender"
+//                 value={formData.gender}
+//                 onChange={handleChange}
+//                 className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+//               >
+//                 <option value="male">Male</option>
+//                 <option value="female">Female</option>
+//               </select>
+//             </div>
 //           </div>
-//           <div className="col-span-2">
-//             <input name="password" type="password" placeholder="Password" className="input w-full" value={user.password} onChange={handleChange} required />
-//             {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-//           </div>
-//           <button type="submit" className="button mt-6 w-full col-span-2">Register</button>
+
+//           {/* Submit Button */}
+//           <button
+//             type="submit"
+//             disabled={loading}
+//             className="w-full p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+//           >
+//             {loading ? "Registering..." : "Register"}
+//           </button>
 //         </form>
-//         <p className="text-red-500 text-sm mt-3 text-center">
-//           Already have an account? <Link href="/login" className="text-primary text-white">Login</Link>
+
+//         {/* Navigation Links */}
+//         <p className="text-gray-300 text-sm text-center mt-6">
+//           Already have an account?{" "}
+//           <a href="/login" className="text-red-400 hover:text-red-600 transition-all">
+//             Login
+//           </a>
 //         </p>
-//         <p className="text-red-500 text-sm mt-3 text-center">
-//           By registering here,you agree to  <Link href="/terms-policy" className="text-primary underline">Terms & condition,Privacy Policy</Link>
-            
-            
+//         <p className="text-white text-sm text-center">
+//           By registering, you agree to{" "}
+//           <Link href="/terms-policy" className="text-red-400 underline hover:text-red-600 transition-all">
+//             Terms & Privacy Policy
+//           </Link>
 //         </p>
-//         <div className="absolute bottom-[-30px] left-1/2 transform -translate-x-1/2"> <Link href="https://flexzone-gym.vercel.app/"className="home-button text-red-600 hover:text-red-800 transition-all duration-300 "><Home className="w-8 h-8" /></Link></div>
+//         <div className="flex justify-center mt-4">
+//           <Link
+//             href="https://flexzone-gym.vercel.app/"
+//             className="text-red-600 hover:text-red-800 transition-all duration-300 flex items-center justify-center"
+//           >
+//             <Home className="w-6 h-6 md:w-8 md:h-8 transition-transform transform hover:scale-110" />
+//           </Link>
+//         </div>
 //       </div>
 //     </div>
 //   );
 // }
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import axios, { AxiosError } from "axios";
 import { Home } from "lucide-react";
 
-export default function Register() {
+export default function RegisterForm() {
   const router = useRouter();
-  const [user, setUser] = useState({
-    name: "",
-    age: "",
-    phone: "",
-    whatsapp: "",
+  const searchParams = useSearchParams();
+  
+  const [formData, setFormData] = useState({
+    full_name: "",
     email: "",
-    password: "",
-    gender: "",
+    age: "",
+    gender: "male",
+    phone_number: "",
+    emergency_contact: "",
+    address: "",
+    pincode: "",
+    health_condition: "",
+    profile_image: null as File | null,
   });
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+  // Get email from URL if available (from OTPless redirect)
+  useEffect(() => {
+    const email = searchParams.get('email');
+    if (email) {
+      setFormData(prev => ({ ...prev, email }));
+    }
+  }, [searchParams]);
 
-    switch (e.target.name) {
-      case "name":
-        setErrors((prev) => ({
-          ...prev,
-          name: /\d/.test(e.target.value) ? "Full Name cannot contain numbers" : "",
-        }));
-        break;
-      case "phone":
-      case "whatsapp":
-        setErrors((prev) => ({
-          ...prev,
-          [e.target.name]: /^\d{10}$/.test(e.target.value) ? "" : "Must be a valid 10-digit number",
-        }));
-        break;
-      case "password":
-        setErrors((prev) => ({
-          ...prev,
-          password: e.target.value.length < 6 ? "Password must be at least 6 characters" : "",
-        }));
-        break;
-      default:
-        break;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, profile_image: file });
+      setPreview(URL.createObjectURL(file));
     }
   };
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-    const validationErrors: { [key: string]: string } = {};
-
-    if (!user.name || /\d/.test(user.name)) validationErrors.name = "Full Name cannot contain numbers";
-    if (!user.phone || !/^\d{10}$/.test(user.phone)) validationErrors.phone = "Must be a valid 10-digit number";
-    if (!user.whatsapp || !/^\d{10}$/.test(user.whatsapp)) validationErrors.whatsapp = "Must be a valid 10-digit number";
-    if (!user.email || !/\S+@\S+\.\S+/.test(user.email)) validationErrors.email = "Invalid email format";
-    if (!user.password || user.password.length < 6) validationErrors.password = "Password must be at least 6 characters";
-    if (!user.gender) validationErrors.gender = "Please select your gender";
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
+    const formDataObj = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== null && value !== '') formDataObj.append(key, value);
+    });
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/v1/api/register`, user);
-      alert("Registration successful! Please login.");
-      router.push("/login");
-    } catch (error) {
-      const err = error as AxiosError<{ message?: string }>;
-      setErrors({ form: err.response?.data?.message || "Something went wrong. Please try again." });
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        body: formDataObj,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Save token in localStorage for authentication
+        localStorage.setItem('authToken', data.token);
+        alert("Registration Successful!");
+        router.push("/dashboard");
+      } else {
+        setError(data.error || "Error in Registration");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-dark">
-      <div className="bg-white/10 p-10 rounded-2xl border border-primary backdrop-blur-2xl shadow-2xl w-96 transition-transform transform hover:scale-105 flex flex-col items-center">
-        <h2 className="text-white text-3xl font-bold mb-6 text-center tracking-wide animate-fadeIn">Register</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 to-gray-800 p-4">
+      <div className="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl border-2 border-red-600">
+        <h2 className="text-3xl font-bold text-white text-center mb-6">Register</h2>
 
-        {errors.form && <p className="text-red-500 text-sm mb-3 text-center">{errors.form}</p>}
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
 
-        <form onSubmit={handleRegister} className="grid grid-cols-2 gap-4 w-full">
-          <div className="col-span-2">
-            <input name="name" type="text" placeholder="Full Name" className="input w-full" value={user.name} onChange={handleChange} required />
-            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Profile Image Upload */}
+          <div className="flex justify-center">
+            <label className="relative cursor-pointer">
+              <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+              {preview ? (
+                <Image src={preview} alt="Profile" width={100} height={100} className="rounded-full border-4 border-gray-400 object-cover" />
+              ) : (
+                <div className="w-24 h-24 flex items-center justify-center rounded-full border-2 border-red-600 bg-gray-700">
+                  <span className="text-2xl text-gray-400">📷</span>
+                </div>
+              )}
+            </label>
           </div>
 
-          <input name="age" type="number" placeholder="Age" className="input w-full" value={user.age} onChange={handleChange} required />
+          {/* Form Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+              <input
+                type="text"
+                name="full_name"
+                placeholder="Enter your full name"
+                value={formData.full_name}
+                onChange={handleChange}
+                required
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              />
+            </div>
 
-          <select name="gender" className="input w-full text-gray-500" value={user.gender} onChange={handleChange} required>
-            <option value="" disabled>Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-          {errors.gender && <p className="text-red-500 text-sm col-span-2">{errors.gender}</p>}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              />
+            </div>
 
-          <input name="phone" type="text" placeholder="Phone Number" className="input w-full" value={user.phone} onChange={handleChange} required />
-          {errors.phone && <p className="text-red-500 text-sm col-span-2">{errors.phone}</p>}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Age</label>
+              <input
+                type="number"
+                name="age"
+                placeholder="Enter your age"
+                value={formData.age}
+                onChange={handleChange}
+                required
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              />
+            </div>
 
-          <input name="whatsapp" type="text" placeholder="WhatsApp Number" className="input w-full" value={user.whatsapp} onChange={handleChange} required />
-          {errors.whatsapp && <p className="text-red-500 text-sm col-span-2">{errors.whatsapp}</p>}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Gender</label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
 
-          <div className="col-span-2">
-            <input name="email" type="email" placeholder="Email" className="input w-full" value={user.email} onChange={handleChange} required />
-            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Phone Number</label>
+              <input
+                type="text"
+                name="phone_number"
+                placeholder="Enter your phone number"
+                value={formData.phone_number}
+                onChange={handleChange}
+                required
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Emergency Number</label>
+              <input
+                type="text"
+                name="emergency_contact"
+                placeholder="Enter emergency contact"
+                value={formData.emergency_contact}
+                onChange={handleChange}
+                required
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Address</label>
+              <input
+                type="text"
+                name="address"
+                placeholder="Enter your address"
+                value={formData.address}
+                onChange={handleChange}
+                required
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Pincode</label>
+              <input
+                type="text"
+                name="pincode"
+                placeholder="Enter your pincode"
+                value={formData.pincode}
+                onChange={handleChange}
+                required
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-300 mb-1">Health Condition</label>
+              <textarea
+                name="health_condition"
+                placeholder="Enter any health conditions or concerns"
+                value={formData.health_condition}
+                onChange={handleChange}
+                className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                rows={3}
+              />
+            </div>
           </div>
 
-          <div className="col-span-2">
-            <input name="password" type="password" placeholder="Password" className="input w-full" value={user.password} onChange={handleChange} required />
-            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-          </div>
-
-          <button type="submit" className="button mt-6 w-full col-span-2 bg-red-600 text-white py-2 rounded-lg font-semibold tracking-wider transition-all duration-300 hover:bg-red-700 shadow-lg hover:shadow-red-500">
-            Register
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
-        <p className="text-white text-sm mt-3 text-center">
-          Already have an account? <Link href="/login" className="text-red-400 hover:text-red-600 transition-all">Login</Link>
+        {/* Navigation Links */}
+        <p className="text-gray-300 text-sm text-center mt-6">
+          Already have an account?{" "}
+          <a href="/login" className="text-red-400 hover:text-red-600 transition-all">
+            Login
+          </a>
         </p>
-
-        <p className="text-white text-sm mt-3 text-center">
-          By registering, you agree to <Link href="/terms-policy" className="text-red-400 underline hover:text-red-600 transition-all">Terms & Privacy Policy</Link>
+        <p className="text-white text-sm text-center">
+          By registering, you agree to{" "}
+          <Link href="/terms-policy" className="text-red-400 underline hover:text-red-600 transition-all">
+            Terms & Privacy Policy
+          </Link>
         </p>
-
-        {/* Home Button Inside the Box */}
-        <div className="mt-6">
-          <Link href="https://flexzone-gym.vercel.app/" className="text-red-600 hover:text-red-800 transition-all duration-300 flex items-center justify-center">
-            <Home className="w-8 h-8 transition-transform transform hover:scale-110" />
+        <div className="flex justify-center mt-4">
+          <Link
+            href="/"
+            className="text-red-600 hover:text-red-800 transition-all duration-300 flex items-center justify-center"
+          >
+            <Home className="w-6 h-6 md:w-8 md:h-8 transition-transform transform hover:scale-110" />
           </Link>
         </div>
       </div>
     </div>
   );
 }
+// "use client";
+// import { useState } from "react";
+// import Image from "next/image";
+// import { useRouter } from "next/navigation";
+// import Link from "next/link";
+// import { Home } from "lucide-react";
+
+// export default function RegisterForm() {
+//   const router = useRouter();
+//   const [formData, setFormData] = useState({
+//     fullName: "",
+//     email: "",
+//     age: "",
+//     gender: "male",
+//     phone: "",
+//     emergency: "",
+//     address: "",
+//     pincode: "",
+//     healthCondition: "",
+//     profileImage: null as File | null,
+//   });
+
+//   const [preview, setPreview] = useState<string | null>(null);
+
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+//     const { name, value } = e.target;
+//     setFormData({ ...formData, [name]: value });
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       setFormData({ ...formData, profileImage: file });
+//       setPreview(URL.createObjectURL(file));
+//     }
+//   };
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     const formDataObj = new FormData();
+//     Object.entries(formData).forEach(([key, value]) => {
+//       if (value) formDataObj.append(key, value);
+//     });
+
+//     const response = await fetch("/api/register", {
+//       method: "POST",
+//       body: formDataObj,
+//     });
+
+//     if (response.ok) {
+//       alert("Registration Successful!");
+//       router.push("/dashboard");
+//     } else {
+//       alert("Error in Registration");
+//     }
+//   };
+
+//   return (
+//     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 to-gray-800 p-4 ">
+//       <div className="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-2xl border-2 border-red-600">
+//         <h2 className="text-3xl font-bold text-white text-center mb-6">Register</h2>
+
+//         <form onSubmit={handleSubmit} className="space-y-6">
+//           {/* Profile Image Upload */}
+//           <div className="flex justify-center">
+//             <label className="relative cursor-pointer">
+//               <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+//               {preview ? (
+//                 <Image src={preview} alt="Profile" width={100} height={100} className="rounded-full border-4 border-gray-400 object-cover" />
+//               ) : (
+//                 <div className="w-24 h-24 flex items-center justify-center rounded-full border-2 border-red-600 bg-gray-700">
+//                   <span className="text-2xl text-gray-400">📷</span>
+//                 </div>
+//               )}
+//             </label>
+//           </div>
+
+//           {/* Form Fields */}
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//             {["FullName", "Email", "Age", "Phone", "Emergency number", "Address", "Pincode", "HealthCondition"].map((field) => (
+//               <div key={field}>
+//                 <label className="block text-sm font-medium text-gray-300 mb-1">
+//                   {field.replace(/([A-Z])/g, " $1").trim()}
+//                 </label>
+//                 <input
+//                   type={field === "email" ? "email" : field === "age" || field === "phone" || field === "pincode" ? "number" : "text"}
+//                   name={field}
+//                   placeholder={`Enter ${field.replace(/([A-Z])/g, " $1").trim()}`}
+//                   value={formData[field as keyof typeof formData]}
+//                   onChange={handleChange}
+//                   required={field !== "profileImage"}
+//                   className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+//                 />
+//               </div>
+//             ))}
+
+//             {/* Gender Selection */}
+//             <div>
+//               <label className="block text-sm font-medium text-gray-300 mb-1">Gender</label>
+//               <select
+//                 name="gender"
+//                 value={formData.gender}
+//                 onChange={handleChange}
+//                 className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+//               >
+//                 <option value="male">Male</option>
+//                 <option value="female">Female</option>
+//               </select>
+//             </div>
+//           </div>
+
+//           {/* Submit Button */}
+//           <button
+//             type="submit"
+//             className="w-full p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all"
+//           >
+//             Register
+//           </button>
+//         </form>
+
+//         {/* Navigation Links */}
+//         <p className="text-gray-300 text-sm text-center mt-6">
+//           Already have an account?{" "}
+//           <a href="/login" className="text-red-400 hover:text-red-600 transition-all">
+//             Login
+//           </a>
+//         </p>
+//         <p className="text-white text-sm text-center">
+//         By registering, you agree to <Link href="/terms-policy" className="text-red-400 underline hover:text-red-600 transition-all">Terms & Privacy Policy</Link>
+
+//         </p>
+//         <div className="flex justify-center mt-4">
+//           <Link href="https://flexzone-gym.vercel.app/" className="text-red-600 hover:text-red-800 transition-all duration-300 flex items-center justify-center">
+//           <Home className="w-6 h-6 md:w-8 md:h-8 transition-transform transform hover:scale-110" />
+          
+//           </Link>
+
+//         </div>
+        
+//       </div>
+//     </div>
+//   );
+// }
 

@@ -60,16 +60,19 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 
 // Define user interface based on your API response
 interface User {
-  id: string;
+  _id: string;
+  name: string;
   email: string;
-  name?: string;
   role: string;
-  membership?: {
-    status: "Active" | "Inactive";
-    plan?: string;
-    expiresAt?: string;
-  };
-  // Add any other user properties returned by your API
+  age: number;
+  gender: string;
+  phone: string;
+  emergency_contact: string;
+  address: string;
+  health_conditions: string;
+  membership_plan: string;
+  membership_status: string;
+  trainer: string | null;
 }
 
 interface UserState {

@@ -45,5 +45,7 @@
     @apply w-6 h-6 border-4 border-white border-t-transparent rounded-full;
     animation: spin 1s linear infinite;
   }
+
+  
   
 }
