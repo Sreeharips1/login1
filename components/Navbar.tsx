@@ -16,6 +16,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
   const handleLogout = () => {
     // Clear auth token from localStorage
     localStorage.removeItem("authToken");
+    localStorage.removeItem('memberID');
 
     // Clear user state from Zustand store
     logout();
@@ -38,7 +39,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
       <div className="flex items-center space-x-4">
         {/* Use Image component for optimized loading */}
         <Image
-          src="/assets/logo.png" // Path to the logo in the public folder
+          src="/logo.png" // Path to the logo in the public folder
           alt="Flex Zone Gym Logo"
           width={40} // Set the width
           height={40} // Set the height

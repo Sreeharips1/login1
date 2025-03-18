@@ -1,79 +1,157 @@
 "use client";
-
 import { useEffect, useState } from "react";
+import { Loader } from "lucide-react";
 
-type Notification = {
-  _id: string;
-  message: string;
-  type: "info" | "warning" | "membership";
-  isRead: boolean;
-  createdAt: string;
-};
+interface PaymentDetails {
+  renewal_date: string;
+}
 
-export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+export default function Notification() {
+  const [renewalDate, setRenewalDate] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const memberID = localStorage.getItem("memberID"); // Retrieve memberID from localStorage
 
   useEffect(() => {
-    const fetchNotifications = async () => {
+    if (!memberID) {
+      setError("Member ID is missing. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
+    // Fetch renewal date
+    const fetchRenewalDate = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/notifications`);
-        if (!response.ok) throw new Error("Failed to fetch notifications");
-        const data = await response.json();
-        setNotifications(data);
-      } catch (error) {
-        console.error(error);
+        const response = await fetch(
+          `http://localhost:5000/api/payment/payment-details/${memberID}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch renewal date");
+        }
+
+        const data: PaymentDetails = await response.json();
+        setRenewalDate(data.renewal_date);
+      } catch (err) {
+        console.error("Error fetching renewal date:", err);
+        setError("Failed to fetch renewal date. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchNotifications();
-  }, []);
+    fetchRenewalDate();
+  }, [memberID]);
 
-  const markAsRead = async (id: string) => {
-    try {
-      await fetch("/api/notifications", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-900">
+        <Loader className="animate-spin h-12 w-12 text-red-500" />
+      </div>
+    );
+  }
 
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif._id === id ? { ...notif, isRead: true } : notif
-        )
-      );
-    } catch (error) {
-      console.error("Error marking notification as read", error);
-    }
-  };
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-900 text-red-500">
+        {error}
+      </div>
+    );
+  }
+
+  if (!renewalDate) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white">
+        No renewal date found.
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Notifications</h2>
-      {notifications.length === 0 ? (
-        <p className="text-gray-500">No notifications</p>
-      ) : (
-        <ul className="space-y-3">
-          {notifications.map((notif) => (
-            <li
-              key={notif._id}
-              className={`p-4 border rounded ${
-                notif.isRead ? "bg-gray-200" : "bg-blue-100"
-              }`}
-            >
-              <p className="text-lg">{notif.message}</p>
-              <p className="text-sm text-gray-500">{new Date(notif.createdAt).toLocaleString()}</p>
-              {!notif.isRead && (
-                <button
-                  onClick={() => markAsRead(notif._id)}
-                  className="mt-2 px-3 py-1 bg-blue-500 text-white rounded"
-                >
-                  Mark as Read
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="p-6 md:p-10 bg-gray-900 min-h-screen text-white">
+      <h1 className="text-3xl font-bold mb-6">Notifications</h1>
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+        <h2 className="text-xl font-semibold mb-4">Renewal Date</h2>
+        <p className="text-gray-400">
+          Your membership needs to be renewed on:{" "}
+          <span className="text-red-500 font-medium">
+            {new Date(renewalDate).toLocaleDateString()}
+          </span>
+        </p>
+      </div>
     </div>
   );
 }
+// "use client"
+// import { useEffect, useState } from "react";
+
+// interface PaymentDetails {
+//   renewal_date: string;
+// }
+
+// export default function Notification() {
+//   const [renewalDate, setRenewalDate] = useState<string | null>(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
+
+//   const memberID = localStorage.getItem("memberID"); // Retrieve memberID from localStorage
+
+//   useEffect(() => {
+//     if (!memberID) {
+//       setError("Member ID is missing. Please log in again.");
+//       setLoading(false);
+//       return;
+//     }
+
+//     // Fetch renewal date
+//     const fetchRenewalDate = async () => {
+//       try {
+//         const response = await fetch(
+//           `http://localhost:5000/api/payment/payment-details/${memberID}`
+//         );
+
+//         if (!response.ok) {
+//           throw new Error("Failed to fetch renewal date");
+//         }
+
+//         const data: PaymentDetails = await response.json();
+//         setRenewalDate(data.renewal_date);
+//       } catch (err) {
+//         console.error("Error fetching renewal date:", err);
+//         setError("Failed to fetch renewal date. Please try again.");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchRenewalDate();
+//   }, [memberID]);
+
+//   if (loading) {
+//     return <div className="p-6 text-center">Loading renewal date...</div>;
+//   }
+
+//   if (error) {
+//     return <div className="p-6 text-center text-red-500">{error}</div>;
+//   }
+
+//   if (!renewalDate) {
+//     return <div className="p-6 text-center">No renewal date found.</div>;
+//   }
+
+//   return (
+//     <div className="p-6 md:p-10 bg-gray-900 min-h-screen text-white">
+//       <h1 className="text-3xl font-bold mb-6">Notifications</h1>
+//       <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+//         <h2 className="text-xl font-semibold mb-4">Renewal Date</h2>
+//         <p className="text-gray-400">
+//           Your membership need to renew on:{" "}
+//           <span className="text-red-500 font-medium">
+//             {new Date(renewalDate).toLocaleDateString()}
+//           </span>
+//         </p>
+//       </div>
+//     </div>
+//   );
+// }

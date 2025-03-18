@@ -169,11 +169,13 @@ export default function DashboardHome() {
 
         const data = await response.json();
         setUser(data.user);
+        localStorage.setItem('memberID',data.user.membershipID)
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Error loading your profile");
         if ((err as Error).message.includes('401')) {
           localStorage.removeItem('authToken');
+          localStorage.removeItem('memberID');
           router.push('/login');
         }
       } finally {
@@ -186,6 +188,7 @@ export default function DashboardHome() {
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('memberID');
     router.push('/login');
   }, [router]);
 

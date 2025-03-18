@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Home } from "lucide-react";
@@ -201,7 +201,7 @@ export default function RegisterForm() {
                 className="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-red-500"
               >
                 <option value="male">Normal</option>
-                <option value="female">Abnormal</option>
+                <option value="female">Not Normal</option>
               </select>
             </div>
           </div>
